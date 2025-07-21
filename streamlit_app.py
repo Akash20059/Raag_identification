@@ -1,23 +1,20 @@
 import streamlit as st
-import numpy as np
 import librosa
+import numpy as np
 import joblib
 import soundfile as sf
-
-# Title
-st.title("🎵 Raga Identification App")
 
 # Load model
 model = joblib.load("raag_model.pkl")
 
-# Feature extraction function
-def extract_features(file_path):
-    y, sr = librosa.load(file_path, sr=None)
+# Extract features
+def extract_features(file):
+    y, sr = librosa.load(file, sr=None)
     mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
-    mfccs_mean = np.mean(mfccs.T, axis=0)
-    return mfccs_mean
+    return np.mean(mfccs.T, axis=0)
 
-# File uploader
+# UI
+st.title("🎵 Raaga Identification App")
 uploaded_file = st.file_uploader("Upload a WAV file", type=["wav"])
 
 if uploaded_file is not None:
@@ -27,6 +24,6 @@ if uploaded_file is not None:
     try:
         features = extract_features("temp.wav")
         prediction = model.predict([features])[0]
-        st.success(f"🎼 Predicted Raga: **{prediction}**")
+        st.success(f"🎼 Predicted Raaga: {prediction}")
     except Exception as e:
         st.error(f"Error: {str(e)}")
